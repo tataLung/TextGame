@@ -4,10 +4,11 @@
     {
         static void Main(string[] args)
         {
-        //試在Main程式區段中解決以下情境: 企劃設計一個遊戲控制機制
+
+            
         //10隻怪物擁有血量(mHp)、最大血量(mMaxHp)、經驗值(mExp)、50 % 機率掉落炸彈(編號1，不堆疊，對目標造成100傷害)、目前狀態(mState, 0🡺滿血 1🡺失血 2🡺死亡)
         //玩家擁有力量(pSt)、經驗值(pExp)、包包(pBag 數量上限 10)。
-        //當玩家按下’0’ 後通過”再次確認”機制後結束遊戲
+        //當玩家按下’esc’ 後通過”再次確認”機制後結束遊戲
         //當玩家按下’1’ 時顯示玩家狀態(力、經驗、包包每格內容)
         //當玩家按下’2’ 進入選怪(確認後顯示該怪物資訊)
         //當按下’3’時，對選擇怪物造成傷害(力量值)
@@ -57,7 +58,9 @@
             //骰到20的話極端成功(爆擊)，傷害加5
             //骰到1極端失敗
             //勇者是法師，Q=火球術 15點傷害 W=冰刃術 15點傷害 E=麻痺術 2點傷害，怪物此回合不能攻擊 R=解離術 20點傷害，每五回合可用一次
-
+            Game monster = new Game();
+            monster.InitializeMonsters();
+            monster.showMonsterStatus();
             Console.WriteLine("勇者!!現在你遇到了一隻怪物!!! 請按Q/W/E/R來進行攻擊!!!\n");
             Console.WriteLine("Q為火球術基礎值為15\nW為冰刃術基礎值為15\nE為麻痺術基礎值為2，此回合敵人不可攻擊，每三回合可用一次\nR為解離術基礎值為20，每五回合可用一次");
             PrintColorText("怪物", ConsoleColor.Red);
@@ -67,89 +70,89 @@
             Console.WriteLine("攻擊時將進行命中擲骰，骰子為1-20，敏捷+骰子>對方防禦則命中，反之未命中");
             Console.WriteLine("命中後將進行傷害擲骰，骰子為1-20，傷害值計算為 (力量+骰子)/對方防禦值*5(玩家力量根據QWER更改，例:輸入Q為15，輸入E為2) \n傷害擲骰骰中20為爆擊，爆擊加成為總傷害+5");
             Console.WriteLine("----------------------------------------------\n");
-            while (monsterHp > 0 && playerHp > 0)
-            {
-                turn++;
-                Console.WriteLine("\n第{0}回合開始----------\n", turn);
-                string attackType = SetAttackEnter();
-                PrintColorText("你", ConsoleColor.Green);
-                Console.WriteLine($"使用了{attackType}");
+            //while (monsterHp > 0 && playerHp > 0)
+            //{
+            //    turn++;
+            //    Console.WriteLine("\n第{0}回合開始----------\n", turn);
+            //    string attackType = SetAttackEnter();
+            //    PrintColorText("你", ConsoleColor.Green);
+            //    Console.WriteLine($"使用了{attackType}");
 
-                //玩家攻擊
-                if (Hit("你", playerDex, monsterAc))
-                {
-                    if (attackType == "麻痺術")
-                    {
-                        isParalysis = true;
-                    }
-                    int damage = Damage("你", playerSt, monsterAc, attackType);
-                    monsterHp -= damage;
-                    if (monsterHp <= 0)
-                    {
-                        monsterHp = 0;
-                        PrintColorText("怪物", ConsoleColor.Red);
-                        Console.Write("被");
-                        PrintColorText("你", ConsoleColor.Green);
-                        Console.WriteLine("殺死了!!");
-                        playerExp += monsterExp;
-                    }
-                    else
-                    {
-                        PrintColorText("怪物", ConsoleColor.Red);
-                        Console.WriteLine("受到了{0}點傷害，他現在還有{1}點生命值", damage, monsterHp);
-                    }
+            //    //玩家攻擊
+            //    if (Hit("你", playerDex, monsterAc))
+            //    {
+            //        if (attackType == "麻痺術")
+            //        {
+            //            isParalysis = true;
+            //        }
+            //        int damage = Damage("你", playerSt, monsterAc, attackType);
+            //        monsterHp -= damage;
+            //        if (monsterHp <= 0)
+            //        {
+            //            monsterHp = 0;
+            //            PrintColorText("怪物", ConsoleColor.Red);
+            //            Console.Write("被");
+            //            PrintColorText("你", ConsoleColor.Green);
+            //            Console.WriteLine("殺死了!!");
+            //            playerExp += monsterExp;
+            //        }
+            //        else
+            //        {
+            //            PrintColorText("怪物", ConsoleColor.Red);
+            //            Console.WriteLine("受到了{0}點傷害，他現在還有{1}點生命值", damage, monsterHp);
+            //        }
 
-                }
-                else
-                {
-                    Console.Write("噢!");
-                    PrintColorText("你", ConsoleColor.Green);
-                    Console.WriteLine("未命中怪物!!! 他現在還有{0}點生命值", monsterHp);
-                }
-                //怪物攻擊
-                if (monsterHp > 0)
-                {
-                    if (!isParalysis)
-                    {
-                        if (Hit("怪物", monsterDex, playerAc))
-                        {
-                            int damage = Damage("怪物", monsterSt, playerAc, "");
-                            playerHp -= damage;
-                            if (playerHp <= 0)
-                            {
-                                playerHp = 0;
-                                PrintColorText("你", ConsoleColor.Green);
-                                Console.WriteLine("被怪物殺了!!");
-                            }
-                            else
-                            {
-                                PrintColorText("你", ConsoleColor.Green);
-                                Console.Write("受到了{0}點傷害，", damage);
-                                Console.Write("你");
-                                Console.WriteLine("現在還有{0}點生命值", playerHp);
-                            }
+            //    }
+            //    else
+            //    {
+            //        Console.Write("噢!");
+            //        PrintColorText("你", ConsoleColor.Green);
+            //        Console.WriteLine("未命中怪物!!! 他現在還有{0}點生命值", monsterHp);
+            //    }
+            //    //怪物攻擊
+            //    if (monsterHp > 0)
+            //    {
+            //        if (!isParalysis)
+            //        {
+            //            if (Hit("怪物", monsterDex, playerAc))
+            //            {
+            //                int damage = Damage("怪物", monsterSt, playerAc, "");
+            //                playerHp -= damage;
+            //                if (playerHp <= 0)
+            //                {
+            //                    playerHp = 0;
+            //                    PrintColorText("你", ConsoleColor.Green);
+            //                    Console.WriteLine("被怪物殺了!!");
+            //                }
+            //                else
+            //                {
+            //                    PrintColorText("你", ConsoleColor.Green);
+            //                    Console.Write("受到了{0}點傷害，", damage);
+            //                    Console.Write("你");
+            //                    Console.WriteLine("現在還有{0}點生命值", playerHp);
+            //                }
 
-                        }
-                        else
-                        {
-                            Console.Write("噢!");
-                            PrintColorText("怪物", ConsoleColor.Red);
-                            Console.Write("未命中");
-                            PrintColorText("你", ConsoleColor.Green);
-                            Console.WriteLine("!!! ");
-                            PrintColorText("你", ConsoleColor.Green);
-                            Console.WriteLine("現在還有{0}點生命值", playerHp);
-                        }
-                    }
-                    else
-                    {
-                        PrintColorText("怪物", ConsoleColor.Red);
-                        Console.WriteLine("被麻痺了，此回合不可攻擊!");
-                        isParalysis = false;
-                    }
-                }
+            //            }
+            //            else
+            //            {
+            //                Console.Write("噢!");
+            //                PrintColorText("怪物", ConsoleColor.Red);
+            //                Console.Write("未命中");
+            //                PrintColorText("你", ConsoleColor.Green);
+            //                Console.WriteLine("!!! ");
+            //                PrintColorText("你", ConsoleColor.Green);
+            //                Console.WriteLine("現在還有{0}點生命值", playerHp);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            PrintColorText("怪物", ConsoleColor.Red);
+            //            Console.WriteLine("被麻痺了，此回合不可攻擊!");
+            //            isParalysis = false;
+            //        }
+            //    }
 
-            }
+            //}
 
             if (monsterHp <= 0)
             {
