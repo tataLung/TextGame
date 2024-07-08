@@ -8,8 +8,14 @@ namespace TextGame
 {
     internal class Game
     {
-        Player wizard = new Player { playerClass = "法師", playerHp = 75, playerMaxHp = 75, playerSt = 15, playerDex = 3, playerAc = 13, playerExp = 18, playerHpState = 1, playerState = 1 };
+        Player wizard = new Player { playerClass = "法師", hp = 75, maxHp = 75, strength = 15, dexterity = 3, armorClass = 13, experience = 18, hpState = 1, status = 1 };
+        List<Player> players = new List<Player>();
         List<Monster> monsters = new List<Monster>();
+
+        //public void InitializePlayer()
+        //{
+        //    players.Add(wizard);
+        //}
 
         public void InitializeMonsters() //之後應該要改成private?
         {
@@ -17,40 +23,40 @@ namespace TextGame
             {
                 monsters.Add(new Monster
                 {
-                    monsterName = "小怪物" + (i + 1).ToString(),
-                    monsterHp = 100,
-                    monsterMaxHp = 100,
-                    monsterSt = 10,
-                    monsterDex = 5,
-                    monsterAc = 3,
-                    monsterExp = 20,
-                    monsterHpState = 1,
-                    monsterState = 1
+                    name = "小怪物" + (i + 1).ToString(),
+                    hp = 20,
+                    maxHp = 20,
+                    strength = 10,
+                    dexterity = 5,
+                    armorClass = 3,
+                    experience = 20,
+                    hpState = 1,
+                    status = 1
                 });
             }
             monsters.Add(new Monster
             {
-                monsterName = "中Boss",
-                monsterHp = 300,
-                monsterMaxHp = 300,
-                monsterSt = 50,
-                monsterDex = 20,
-                monsterAc = 10,
-                monsterExp = 100,
-                monsterHpState = 1,
-                monsterState = 1
+                name = "中Boss",
+                hp = 30,
+                maxHp = 30,
+                strength = 50,
+                dexterity = 20,
+                armorClass = 10,
+                experience = 100,
+                hpState = 1,
+                status = 1
             });
             monsters.Add(new Monster
             {
-                monsterName = "最終Boss",
-                monsterHp = 500,
-                monsterMaxHp = 500,
-                monsterSt = 80,
-                monsterDex = 30,
-                monsterAc = 15,
-                monsterExp = 200,
-                monsterHpState = 1,
-                monsterState = 1
+                name = "最終Boss",
+                hp = 50,
+                maxHp = 50,
+                strength = 80,
+                dexterity = 30,
+                armorClass = 15,
+                experience = 200,
+                hpState = 1,
+                status = 1
             });
 
         }
@@ -59,8 +65,18 @@ namespace TextGame
         {
             foreach (var monster in monsters)
             {
-                Console.WriteLine($"{monster.monsterName}, 血量: {monster.monsterHp}/{monster.monsterMaxHp}, 力量: {monster.monsterSt}, 敏捷: {monster.monsterDex}, 防禦: {monster.monsterAc}, 經驗值: {monster.monsterExp}, 生命狀態: {monster.monsterHpState}, 效果狀態: {monster.monsterState}");
+                Console.WriteLine($"{monster.name}, 血量: {monster.hp}/{monster.maxHp}, 力量: {monster.strength}, 敏捷: {monster.dexterity}, 防禦: {monster.armorClass}, 經驗值: {monster.experience}, 生命狀態: {monster.hpState}, 效果狀態: {monster.status}");
             }
+        }
+        public void showPlayerClass()
+        {
+            Console.WriteLine($"{wizard.playerClass}, 血量: {wizard.hp}/{wizard.maxHp}, 力量: {wizard.strength}, 敏捷: {wizard.dexterity}, 防禦: {wizard.armorClass}, 經驗值: {wizard.experience}, 生命狀態: {wizard.hpState}, 效果狀態: {wizard.status}");
+            Console.Write("包包狀態:");
+            for (int i = 0; i < wizard.playerBag.Count; i++)
+            {
+                Console.Write(wizard.playerBag[i]);
+            }
+            Console.WriteLine();
         }
     }
 }

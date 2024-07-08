@@ -9,14 +9,14 @@ namespace TextGame
     internal class Player
     {
         public string playerClass { get; set; } //玩家職業
-        public int playerHp { get; set; } //玩家血量
-        public int playerMaxHp { get; set; } //玩家最大血量
-        public float playerSt { get; set; } //玩家力量
-        public int playerDex { get; set; } //玩家敏捷
-        public int playerAc { get; set; } //玩家防禦值
-        public int playerExp { get; set; } //玩家經驗值
-        public int playerHpState { get; set; } //玩家狀態 1=滿血2=失血3=死亡
-        public int playerState { get; set; } //玩家狀態 1=正常 2=麻痺 3=中毒
+        public int hp { get; set; } //玩家血量
+        public int maxHp { get; set; } //玩家最大血量
+        public float strength { get; set; } //玩家力量
+        public int dexterity { get; set; } //玩家敏捷
+        public int armorClass { get; set; } //玩家防禦值
+        public int experience { get; set; } //玩家經驗值
+        public int hpState { get; set; } //玩家狀態 1=滿血2=失血3=死亡
+        public int status { get; set; } //玩家狀態 1=正常 2=麻痺 3=中毒
         public List<int> playerBag { get; set; } //玩家包包 0.空 1.炸彈 2.核彈 3.血包 數量上限10
 
 

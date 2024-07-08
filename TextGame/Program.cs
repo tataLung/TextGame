@@ -58,9 +58,10 @@
             //骰到20的話極端成功(爆擊)，傷害加5
             //骰到1極端失敗
             //勇者是法師，Q=火球術 15點傷害 W=冰刃術 15點傷害 E=麻痺術 2點傷害，怪物此回合不能攻擊 R=解離術 20點傷害，每五回合可用一次
-            Game monster = new Game();
-            monster.InitializeMonsters();
-            monster.showMonsterStatus();
+            Game game = new Game();
+            game.InitializeMonsters();
+            game.showMonsterStatus();
+            game.showPlayerClass();
             Console.WriteLine("勇者!!現在你遇到了一隻怪物!!! 請按Q/W/E/R來進行攻擊!!!\n");
             Console.WriteLine("Q為火球術基礎值為15\nW為冰刃術基礎值為15\nE為麻痺術基礎值為2，此回合敵人不可攻擊，每三回合可用一次\nR為解離術基礎值為20，每五回合可用一次");
             PrintColorText("怪物", ConsoleColor.Red);
