@@ -22,8 +22,8 @@ namespace TextGame
 
         public Player() 
         {
-            playerBag = new List<int>(10);
-            //playerBag = new List<int>(new int[10]);
+            //playerBag = new List<int>(10);
+            playerBag = new List<int>(new int[10]);
             //與playerBag = new List<int>(10);的差別是使用 PlayerBag = new List<int>(10); 时，你得到的是一个容量为 10 但实际上为空的列表，适用于需要动态添加元素的场景。
             //使用 PlayerBag = new List<int>(new int[10]); 时，你得到的是一个已经包含 10 个元素（默认值为 0）的列表，适用于需要初始化固定数量元素的场景。
 

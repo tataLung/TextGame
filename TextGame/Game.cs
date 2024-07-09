@@ -16,7 +16,7 @@ namespace TextGame
     internal class Game
     {
         public Player wizard = new Player { playerClass = "法師", hp = 75, maxHp = 75, strength = 5, dexterity = 3, armorClass = 13, experience = 18, hpState = 1, status = 1 };
-        List<Player> players = new List<Player>();
+        //List<Player> players = new List<Player>();
         public List<Monster> monsters = new List<Monster>();
         //public List<Monster> monsters { get; private set; } = new List<Monster>();
         Random random = new Random();
@@ -26,6 +26,9 @@ namespace TextGame
         //    players.Add(wizard);
         //}
 
+        /// <summary>
+        /// 初始化怪物，加入多隻怪物
+        /// </summary>
         public void InitializeMonsters() //之後應該要改成private?
         {
             for (int i = 0; i < 3; i++)
@@ -44,19 +47,19 @@ namespace TextGame
                     status = 1
                 });
             }
-            monsters.Add(new Monster(8)
-            {
-                //id = 8,
-                name = "中Boss",
-                hp = 30,
-                maxHp = 30,
-                strength = 20,
-                dexterity = 6,
-                armorClass = 13,
-                experience = 100,
-                hpState = 1,
-                status = 1
-            });
+            //monsters.Add(new Monster(8)
+            //{
+            //    //id = 8,
+            //    name = "中Boss",
+            //    hp = 30,
+            //    maxHp = 30,
+            //    strength = 20,
+            //    dexterity = 6,
+            //    armorClass = 13,
+            //    experience = 100,
+            //    hpState = 1,
+            //    status = 1
+            //});
             //monsters.Add(new Monster
             //{
             //    id = 9,
@@ -93,30 +96,36 @@ namespace TextGame
             PrintColorText(wizard.playerClass, ConsoleColor.Green);
             Console.WriteLine($", 血量: {wizard.hp}/{wizard.maxHp}, 力量: {wizard.strength}, 敏捷: {wizard.dexterity}, 防禦: {wizard.armorClass}, 經驗值: {wizard.experience}, 生命狀態: {(wizard.hpState == 1 ? "滿血" : wizard.hpState == 2 ? "失血" : "死亡")}, 效果狀態: {(wizard.status == 1 ? "正常" : wizard.status == 2 ? "麻痺" : "中毒")}");
             Console.Write("包包狀態:");
-            if (wizard.playerBag.Count == 0)
+            if (wizard.playerBag.All(item => item == 0))
             {
                 Console.WriteLine("空的");
             }
-            for (int i = 0; i < wizard.playerBag.Count; i++)
+            else
             {
-                Console.Write(wizard.playerBag[i]);
-                Console.WriteLine("個炸彈");
+                int bombCount = wizard.playerBag.Count(item => item == 1);
+                Console.WriteLine($"{bombCount} 個炸彈");
+                //for (int i = 0; i < wizard.playerBag.Count; i++)
+                //{
+                //    Console.Write(wizard.playerBag[i]);
+                //    Console.WriteLine("個炸彈");
+                //}
             }
+            
             Console.WriteLine();
         }
         /// <summary>
-        /// 選擇要攻擊的怪物
+        /// 選擇要攻擊或復活的怪物
         /// </summary>
         /// <param name="monsters"></param>
         /// <returns></returns>
          public Monster SelectMonster(List<Monster> monsters)
         {
-            Console.WriteLine("選擇怪物 (0-9):");
+            Console.WriteLine($"選擇怪物 (0-{monsters.Count - 1}):");
             int index;
             if (int.TryParse(Console.ReadLine(), out index) && index >= 0 && index < monsters.Count)
             {
                 Monster monster = monsters[index];
-                Console.WriteLine($"編號 {index}, {monster.name} - 血量: {monster.hp}/{monster.maxHp}, 效果狀態: {monster.status}");
+                Console.WriteLine($"編號 {index}, {monster.name} - 血量: {monster.hp}/{monster.maxHp}, 效果狀態: {(monster.status == 1 ? "正常" : monster.status == 2 ? "麻痺" : monster.status == 3 ? "渾沌" : "死亡")}");
                 return monster;
             }
             else
@@ -127,13 +136,13 @@ namespace TextGame
         }
 
         /// <summary>
-        /// 命中擲骰 (敏捷+骰子 > 防禦 = 命中)
+        /// 玩家攻擊怪物的命中擲骰 (敏捷+骰子 > 防禦 = 命中)
         /// </summary>
         /// <param name="turn"></param>
         /// <param name="dex"></param>
         /// <param name="ac"></param>
         /// <returns>是否命中</returns>
-        public bool Hit(string turn, Monster monster)
+        public bool HitMonster(string turn, Monster monster)
         {
             int attak;
             int hitRoll = rollDice(turn, "命中");
@@ -161,29 +170,20 @@ namespace TextGame
         }
 
         /// <summary>
-        /// 傷害擲骰，若命中執行傷害計算 (力量+骰子/防禦值 * 5 = 傷害)
+        /// 玩家攻擊怪物的傷害擲骰，若命中執行傷害計算 (力量+骰子/防禦值 * 5 = 傷害)
         /// </summary>
         /// <param name="turn"></param>
         /// <param name="monster"></param>
         /// <param name="wizard"></param>
         /// <returns>傷害值</returns>
-        public int Damage(string turn, Monster monster, Player wizard)
+        public int PlayerDamage( Monster monster, Player wizard)
         {
             float damage;
-            int damageRoll = rollDice(turn, "傷害");
+            int damageRoll = rollDice("你", "傷害");
 
             damage = (wizard.strength + damageRoll) / monster.armorClass * 5;
 
-            if (turn == "你")
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            Console.Write(turn);
-            Console.ResetColor();
+            PrintColorText("你", ConsoleColor.Green);
             Console.WriteLine($"骰中{damageRoll}，傷害值為({wizard.strength}+{damageRoll})/{monster.armorClass}*5={(int)damage}");
             if (damageRoll == 20)
             {
@@ -194,7 +194,7 @@ namespace TextGame
         }
 
         /// <summary>
-        /// 判定玩家輸入何種法術
+        /// 判定玩家輸入何種攻擊方式
         /// </summary>
         /// <returns></returns>
         public string SetAttackEnter()
@@ -235,10 +235,17 @@ namespace TextGame
                         }
                     case "B":
                         //使用炸彈一定命中
-                        
-                        return "轟炸";
+                        if(wizard.playerBag.Count(item => item == 1) == 0)
+                        {
+                            Console.WriteLine("包包沒有炸彈!!");
+                            return SetAttackEnter();
+                        }
+                        else
+                        {
+                            return "轟炸";
+                        }
                     default:
-                        Console.WriteLine("請輸入QWER其中一鍵");
+                        Console.WriteLine("請輸入QWERB其中一鍵");
                         return SetAttackEnter();
                 }
             }
@@ -309,13 +316,16 @@ namespace TextGame
             {
                 Console.WriteLine("怪物掉落了一個炸彈");
                 //if (wizard.playerBag.Count < 10 && wizard.playerBag.FindAll(i => i == 1).Count < wizard.playerBag.Count)
-                if (wizard.playerBag.Count < 10)
-                    {
-                    wizard.playerBag.Add(1);
-                    Console.WriteLine("你獲得一個炸彈!!!");
+                if (wizard.playerBag.Contains(0))
+                //if (wizard.playerBag.Count < 10)
+                {
+                    int index = wizard.playerBag.IndexOf(0);
+                    wizard.playerBag[index] = 1;
+                    //wizard.playerBag.Add(1);
+                    Console.WriteLine("獲得一個炸彈!!!");
                 } else
                 {
-                    Console.WriteLine("你的包包滿了!炸彈消失了QQQ");
+                    Console.WriteLine("歐歐QQQ包包滿了!炸彈消失了QQQ");
                 }
             }
             else
@@ -371,6 +381,8 @@ namespace TextGame
                 monster.hpState = 3;
                 monster.status = 4;
                 wizard.experience += monster.experience;
+                PrintColorText("你", ConsoleColor.Green);
+                Console.WriteLine($"獲得了{monster.experience}點經驗值!");
                 BombFall(wizard);
             }
             else
@@ -424,6 +436,12 @@ namespace TextGame
             return monsters.All(monster => monster.hpState == 3);
         }
 
+        /// <summary>
+        /// 怪物攻擊玩家的傷害擲骰，若命中執行傷害計算 (力量+骰子/防禦值 * 5 = 傷害)
+        /// </summary>
+        /// <param name="monster"></param>
+        /// <param name="wizard"></param>
+        /// <returns></returns>
         public int MonsterDamage( Monster monster, Player wizard)
         {
             float damage;
@@ -484,6 +502,19 @@ namespace TextGame
             PrintColorText(target.name, ConsoleColor.Red);
             Console.WriteLine("造成了5點傷害");
             target.hp -= 5;
+        }
+
+        /// <summary>
+        /// 將選擇的怪物復活
+        /// </summary>
+        /// <param name="monster"></param>
+        public void ReviveMonster(Monster monster)
+        {
+            monster.hp = monster.maxHp;
+            monster.hpState = 1;
+            monster.status = 1;
+            PrintColorText(monster.name,ConsoleColor.Red);
+            Console.WriteLine("已復活，血量已滿。");
         }
     }
 }
