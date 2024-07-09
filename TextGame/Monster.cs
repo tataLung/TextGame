@@ -8,7 +8,7 @@ namespace TextGame
 {
     internal class Monster
     {
-        public int id {  get; set; } //怪物編號
+        public int id {  get; private set; } //怪物編號
         public string name  { get; set;} //怪物名字
         public int hp { get; set;} //怪物血量
         public int maxHp { get; set; } //怪物最大血量
@@ -16,10 +16,17 @@ namespace TextGame
         public int dexterity { get; set; } //怪物敏捷
         public int armorClass { get; set; } //怪物防禦值
         public int experience { get; set; } //怪物經驗值
+
         public int hpState { get; set; } //怪物狀態 1=滿血2=失血3=死亡
-        public int status { get; set; } //怪物狀態 1=正常 2=麻痺 3=渾沌
+        public int status { get; set; } //怪物狀態 1=正常 2=麻痺 3=渾沌 4=死亡
 
         public List<int> Item {  get; set; } //掉落物 1.炸彈 2.核彈 3.血包
+
+        public Monster(int id)
+        {
+            this.id = id;
+            //this.name = name + id.ToString();
+        }
 
     }
 }
