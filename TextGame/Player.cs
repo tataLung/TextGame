@@ -8,7 +8,7 @@ namespace TextGame
 {
     internal class Player
     {
-        public string playerClass { get; set; } //玩家職業
+        public string playerClass { get; private set; } //玩家職業
         public int hp { get; set; } //玩家血量
         public int maxHp { get; set; } //玩家最大血量
         public float strength { get; set; } //玩家力量
@@ -18,10 +18,12 @@ namespace TextGame
         public int hpState { get; set; } //玩家狀態 1=滿血2=失血3=死亡
         public int status { get; set; } //玩家狀態 1=正常 2=麻痺 3=中毒
         public List<int> playerBag { get; set; } //玩家包包 0.空 1.炸彈 2.核彈 3.血包 數量上限10
+        public Dictionary<char, Attack> Attacks { get; set; } = new Dictionary<char, Attack>(); //玩家攻擊招式
+        public bool isAI { get; set; }
 
-
-        public Player() 
+        public Player(string playerClass) 
         {
+            this.playerClass = playerClass;
             //playerBag = new List<int>(10);
             playerBag = new List<int>(new int[10]);
             //與playerBag = new List<int>(10);的差別是使用 PlayerBag = new List<int>(10); 时，你得到的是一个容量为 10 但实际上为空的列表，适用于需要动态添加元素的场景。
@@ -29,5 +31,9 @@ namespace TextGame
 
         }
 
+        public virtual string GetAttack(char attackKey, int turn)
+        {
+            return "";
+        }
     }
 }
