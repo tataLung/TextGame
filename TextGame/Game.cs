@@ -15,7 +15,7 @@ namespace TextGame
     //玩家回合結束後怪物打回來
     //怪物獲得狀態後的回饋
     //我死了怪物會繼續鞭屍，要修一下
-    //1的玩家資料，調炸彈會變成有兩個
+    //1的玩家資料，調炸彈會變成有兩個 x
     internal class Game
     {
         public Player wizard = new Player("法師") { hp = 75, maxHp = 75, strength = 5, dexterity = 3, armorClass = 13, experience = 0, hpState = 1, status = 1 };
@@ -138,6 +138,12 @@ namespace TextGame
             warrior.Attacks.Add('E', new Attack("掃堂腿", 10, turn => turn % 5 == 0));
             warrior.Attacks.Add('R', new Attack("重擊", 25, turn => turn % 6 == 0));
             warrior.Attacks.Add('B', new Attack("轟炸", 20, turn => warrior.playerBag.Count(item => item == 1) > 0));
+
+            assassin.Attacks.Add('Q', new Attack("穿刺", 15, turn => true));
+            assassin.Attacks.Add('W', new Attack("切割", 15, turn => true));
+            assassin.Attacks.Add('E', new Attack("掃堂腿", 10, turn => turn % 5 == 0));
+            assassin.Attacks.Add('R', new Attack("偷襲", 18, turn => turn % 3 == 0));
+            assassin.Attacks.Add('B', new Attack("轟炸", 20, turn => assassin.playerBag.Count(item => item == 1) > 0));
             // 添加其他职业的招式
         }
         public Game()
