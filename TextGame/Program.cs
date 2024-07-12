@@ -12,7 +12,7 @@ namespace TextGame
         static void Main(string[] args)
         {
             Game game = new Game();
-            game.InitializeMonsters();
+            //game.InitializeMonsters();
             Console.WriteLine("勇者，就在剛才，你被異世界傳送器，也就是卡車撞了，請選擇你的職業以及一位同伴!");
             game.showAllPlayerClass();
             game.InitializePlayer();
@@ -22,7 +22,7 @@ namespace TextGame
             Console.WriteLine("勇者!!現在你遇到了一群怪物!!! 請按3後進入戰鬥，選擇攻擊怪物對象按ENTER，並輸入Q/W/E/R/B來進行攻擊!!!\n");
             //Console.WriteLine("Q為火球術基礎值為15\nW為冰刃術基礎值為15\nE為麻痺術基礎值為2，此回合敵人不可攻擊，每三回合可用一次\nR為解離術基礎值為20，每五回合可用一次\nB為使用炸彈，固定造成20點傷害");
             game.showMonsterStatus();
-            game.showPlayerClass();
+            //game.showPlayerClass();
             Console.WriteLine("攻擊時將進行命中擲骰，骰子為1-20，敏捷+骰子>對方防禦則命中，反之未命中");
             Console.WriteLine("命中後將進行傷害擲骰，骰子為1-20，傷害值計算為 (力量+骰子)/對方防禦值*5(玩家力量根據QWER更改，例:輸入Q為15，輸入E為2) \n傷害擲骰骰中20為爆擊，爆擊加成為總傷害+5");
             Console.WriteLine("----------------------------------------------\n");

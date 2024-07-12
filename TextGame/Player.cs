@@ -18,7 +18,7 @@ namespace TextGame
         public int hpState { get; set; } //玩家狀態 1=滿血2=失血3=死亡
         public int status { get; set; } //玩家狀態 1=正常 2=麻痺 3=中毒
         public List<int> playerBag { get; set; } //玩家包包 0.空 1.炸彈 2.核彈 3.血包 數量上限10
-        public Dictionary<char, Attack> Attacks { get; set; } = new Dictionary<char, Attack>(); //玩家攻擊招式
+        public Dictionary<char, Skill> Attacks { get; set; } = new Dictionary<char, Skill>(); //玩家攻擊招式
         public bool isAI { get; set; }
 
         public Player(string playerClass) 

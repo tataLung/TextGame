@@ -16,6 +16,8 @@ namespace TextGame
     //怪物獲得狀態後的回饋
     //我死了怪物會繼續鞭屍，要修一下
     //1的玩家資料，調炸彈會變成有兩個 x
+
+    //把補血功能寫好就先交作業3
     internal class Game
     {
         public Player wizard = new Player("法師") { hp = 75, maxHp = 75, strength = 5, dexterity = 3, armorClass = 13, experience = 0, hpState = 1, status = 1 };
@@ -25,9 +27,14 @@ namespace TextGame
         public Player druid = new Player("德魯伊") { hp = 80, maxHp = 80, strength = 5, dexterity = 4, armorClass = 13, experience = 0, hpState = 1, status = 1 };
         public List<Player> players = new List<Player>();
         public List<Monster> monsters = new List<Monster>();
-        //public List<Monster> monsters { get; private set; } = new List<Monster>();
         Random random = new Random();
         public int turn = 0;
+
+        public Game()
+        {
+            InitializeMonsters();
+            SetAttacks();
+        }
 
         /// <summary>
         /// 初始化怪物，加入多隻怪物
@@ -79,6 +86,9 @@ namespace TextGame
 
         }
 
+        /// <summary>
+        /// 顯示職業及其技能(應該要用繼承重寫)
+        /// </summary>
         public void showAllPlayerClass()
         {
             PrintColorText(wizard.playerClass, ConsoleColor.Green);
@@ -87,22 +97,45 @@ namespace TextGame
             Console.WriteLine($"Q:{wizard.Attacks['Q'].name},力量:{wizard.Attacks['Q'].strength}");
             Console.WriteLine($"W:{wizard.Attacks['W'].name},力量:{wizard.Attacks['W'].strength}");
             Console.WriteLine($"E:{wizard.Attacks['E'].name},力量:{wizard.Attacks['E'].strength},每三回合可使用一次，敵人陷入麻痺，此回合不可攻擊");
-            Console.WriteLine($"R:{wizard.Attacks['R'].name},力量:{wizard.Attacks['W'].strength},每五回合可使用一次，敵人陷入混亂，此回合將隨機攻擊其他怪物");
+            Console.WriteLine($"R:{wizard.Attacks['R'].name},力量:{wizard.Attacks['R'].strength},每五回合可使用一次，敵人陷入混亂，此回合將隨機攻擊其他怪物");
             Console.WriteLine();
             PrintColorText(warrior.playerClass, ConsoleColor.Green);
             Console.WriteLine($", 血量: {warrior.hp}/{warrior.maxHp}, 力量: {warrior.strength}, 敏捷: {warrior.dexterity}, 防禦: {warrior.armorClass}, 經驗值: {warrior.experience}");
+            Console.WriteLine("技能:");
+            Console.WriteLine($"Q:{warrior.Attacks['Q'].name},力量:{warrior.Attacks['Q'].strength}");
+            Console.WriteLine($"W:{warrior.Attacks['W'].name},力量:{warrior.Attacks['W'].strength}");
+            Console.WriteLine($"E:{warrior.Attacks['E'].name},力量:{warrior.Attacks['E'].strength},每五回合可使用一次，敵人陷入麻痺，此回合不可攻擊");
+            Console.WriteLine($"R:{warrior.Attacks['R'].name},力量:{warrior.Attacks['R'].strength},每六回合可使用一次，敵人陷入混亂，此回合將隨機攻擊其他怪物");
+            Console.WriteLine();
             PrintColorText(assassin.playerClass, ConsoleColor.Green);
-            Console.WriteLine($", 血量: {warrior.hp} / {warrior.maxHp} , 力量:  {assassin.strength} , 敏捷:  {assassin.dexterity} , 防禦:  {assassin.armorClass} , 經驗值:  {assassin.experience}");
+            Console.WriteLine($", 血量: {assassin.hp} / {assassin.maxHp} , 力量:  {assassin.strength} , 敏捷:  {assassin.dexterity} , 防禦:  {assassin.armorClass} , 經驗值:  {assassin.experience}");
+            Console.WriteLine("技能:");
+            Console.WriteLine($"Q:{assassin.Attacks['Q'].name},力量:{assassin.Attacks['Q'].strength}");
+            Console.WriteLine($"W:{assassin.Attacks['W'].name},力量:{assassin.Attacks['W'].strength}");
+            Console.WriteLine($"E:{assassin.Attacks['E'].name},力量:{assassin.Attacks['E'].strength},每兩回合可使用一次，敵人陷入麻痺，此回合不可攻擊");
+            Console.WriteLine($"R:{assassin.Attacks['R'].name},力量:{assassin.Attacks['R'].strength},每三回合可使用一次");
+            Console.WriteLine();
             PrintColorText(cleric.playerClass, ConsoleColor.Green);
-            Console.WriteLine($", 血量: {wizard.hp}/{wizard.maxHp}, 力量: {cleric.strength}, 敏捷: {cleric.dexterity}, 防禦: {cleric.armorClass}, 經驗值: {cleric.experience}");
+            Console.WriteLine($", 血量: {cleric.hp}/{cleric.maxHp}, 力量: {cleric.strength}, 敏捷: {cleric.dexterity}, 防禦: {cleric.armorClass}, 經驗值: {cleric.experience}");
+            Console.WriteLine("技能:");
+            Console.WriteLine($"Q:{cleric.Attacks['Q'].name},力量:{cleric.Attacks['Q'].strength}");
+            Console.WriteLine($"W:{cleric.Attacks['W'].name},力量:{cleric.Attacks['W'].strength}");
+            Console.WriteLine($"E:{cleric.Attacks['E'].name},力量:{cleric.Attacks['E'].strength},每兩回合可使用一次，幫自己補5滴血");
+            Console.WriteLine($"R:{cleric.Attacks['R'].name},力量:{cleric.Attacks['R'].strength},每五回合可使用一次，全體補10滴血");
+            Console.WriteLine();
             PrintColorText(druid.playerClass, ConsoleColor.Green);
-            Console.WriteLine($", 血量: {warrior.hp} / {warrior.maxHp} , 力量:  {druid.strength} , 敏捷:  {druid.dexterity} , 防禦:  {druid.armorClass} , 經驗值:  {druid.experience}");
+            Console.WriteLine($", 血量: {druid.hp} / {druid.maxHp} , 力量:  {druid.strength} , 敏捷:  {druid.dexterity} , 防禦:  {druid.armorClass} , 經驗值:  {druid.experience}");
+            Console.WriteLine("技能:");
+            Console.WriteLine($"Q:{druid.Attacks['Q'].name},力量:{druid.Attacks['Q'].strength}");
+            Console.WriteLine($"W:{druid.Attacks['W'].name},力量:{druid.Attacks['W'].strength}");
+            Console.WriteLine($"E:{druid.Attacks['E'].name},力量:{druid.Attacks['E'].strength},每兩回合可使用一次，幫自己補5滴血");
+            Console.WriteLine($"R:{druid.Attacks['R'].name},力量:{druid.Attacks['R'].strength},每六回合可使用一次，敵人陷入麻痺，此回合不可攻擊");
             Console.WriteLine("所有職業B為使用炸彈，固定造成20點傷害，且一定命中");
             Console.WriteLine();
         }
 
         /// <summary>
-        /// 選擇人物及伙伴職業
+        /// 選擇人物及伙伴職業(之後應該要搬到player)
         /// </summary>
         public void InitializePlayer()
         {
@@ -125,103 +158,13 @@ namespace TextGame
             Console.WriteLine($", 血量: {players[1].hp} / {players[1].maxHp} , 力量:  {players[1].strength} , 敏捷:  {players[1].dexterity} , 防禦:  {players[1].armorClass} , 經驗值:  {players[1].experience}");
         }
 
-        private void SetAttacks()
-        {
-            wizard.Attacks.Add('Q', new Attack("火球術", 15, turn => true));
-            wizard.Attacks.Add('W', new Attack("冰刃術", 15, turn => true));
-            wizard.Attacks.Add('E', new Attack("麻痺術", 2, turn => turn % 3 == 0));
-            wizard.Attacks.Add('R', new Attack("解離術", 20, turn => turn % 5 == 0));
-            wizard.Attacks.Add('B', new Attack("轟炸", 20, turn => wizard.playerBag.Count(item => item == 1) > 0));
-
-            warrior.Attacks.Add('Q', new Attack("揮砍", 15, turn => true));
-            warrior.Attacks.Add('W', new Attack("貓一拳", 15, turn => true));
-            warrior.Attacks.Add('E', new Attack("掃堂腿", 10, turn => turn % 5 == 0));
-            warrior.Attacks.Add('R', new Attack("重擊", 25, turn => turn % 6 == 0));
-            warrior.Attacks.Add('B', new Attack("轟炸", 20, turn => warrior.playerBag.Count(item => item == 1) > 0));
-
-            assassin.Attacks.Add('Q', new Attack("穿刺", 15, turn => true));
-            assassin.Attacks.Add('W', new Attack("切割", 15, turn => true));
-            assassin.Attacks.Add('E', new Attack("掃堂腿", 10, turn => turn % 5 == 0));
-            assassin.Attacks.Add('R', new Attack("偷襲", 18, turn => turn % 3 == 0));
-            assassin.Attacks.Add('B', new Attack("轟炸", 20, turn => assassin.playerBag.Count(item => item == 1) > 0));
-            // 添加其他职业的招式
-        }
-        public Game()
-        {
-            SetAttacks();
-        }
-
-        public string SetAttackEnter(Player player)
-        {
-            char attackEnter;
-
-            if (player.isAI)
-            {
-                // 隨機選擇一個有效的攻擊鍵
-                var availableAttacks = player.Attacks.Where(a => a.Value.CanUseAttack(turn) || a.Key == 'B').Select(a => a.Key).ToList();
-                attackEnter = availableAttacks[random.Next(availableAttacks.Count)];
-            }
-            else
-            {
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true); // 捕獲按鍵訊息
-                attackEnter = keyInfo.KeyChar;
-            }
-
-            if (char.IsLetter(attackEnter))
-            {
-                attackEnter = char.ToUpper(attackEnter);
-
-                if (player.Attacks.ContainsKey(attackEnter))
-                {
-                    var attack = player.Attacks[attackEnter];
-                    if (attack.name == "轟炸" && !player.playerBag.Contains(1))
-                    {
-                        if (!player.isAI)
-                        {
-                            Console.WriteLine("包包沒有炸彈!!");
-                            return SetAttackEnter(player);
-                        }
-                        else
-                        {
-                            // 電腦玩家重新選擇攻擊
-                            return SetAttackEnter(player);
-                        }
-                    }
-                    if (attack.CanUseAttack(turn))
-                    {
-                        //PrintColorText()
-                        Console.WriteLine($"使用了{attack.name}");
-                        player.strength = attack.strength;
-                        return attack.name;
-                    }
-                    else
-                    {
-                        if (!player.isAI)
-                        {
-                            Console.WriteLine($"當前回合不能使用 {attack.name}。");
-                        }
-                    }
-                }
-                else
-                {
-                    if (!player.isAI)
-                    {
-                        Console.WriteLine("請輸入有效的攻擊鍵");
-                    }
-                }
-                return SetAttackEnter(player);
-            }
-            else
-            {
-                if (!player.isAI)
-                {
-                    Console.WriteLine("\n輸入的不是字母。請再試一次。");
-                }
-                return SetAttackEnter(player);
-            }
-        }
-
-        private bool AddPlayerToClass(char input,bool isAI)
+        /// <summary>
+        /// 將玩家選擇的職業添加到list中(之後應該要搬到player)
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="isAI"></param>
+        /// <returns></returns>
+        private bool AddPlayerToClass(char input, bool isAI)
         {
             Player player = null;
             switch (input)
@@ -260,6 +203,118 @@ namespace TextGame
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 加入角色技能(之後搬到data)
+        /// </summary>
+        private void SetAttacks()
+        {
+            wizard.Attacks.Add('Q', new Attack("火球術", 15, turn => true));
+            wizard.Attacks.Add('W', new Attack("冰刃術", 15, turn => true));
+            wizard.Attacks.Add('E', new Attack("麻痺術", 5, turn => turn % 3 == 0));
+            wizard.Attacks.Add('R', new Attack("解離術", 20, turn => turn % 5 == 0));
+            wizard.Attacks.Add('B', new Attack("轟炸", 20, turn => wizard.playerBag.Count(item => item == 1) > 0));
+
+            warrior.Attacks.Add('Q', new Attack("揮砍", 15, turn => true));
+            warrior.Attacks.Add('W', new Attack("貓一拳", 15, turn => true));
+            warrior.Attacks.Add('E', new Attack("掃堂腿", 10, turn => turn % 5 == 0));
+            warrior.Attacks.Add('R', new Attack("重擊", 25, turn => turn % 6 == 0));
+            warrior.Attacks.Add('B', new Attack("轟炸", 20, turn => warrior.playerBag.Count(item => item == 1) > 0));
+
+            assassin.Attacks.Add('Q', new Attack("穿刺", 15, turn => true));
+            assassin.Attacks.Add('W', new Attack("切割", 15, turn => true));
+            assassin.Attacks.Add('E', new Attack("偷襲", 3, turn => turn % 2 == 0));
+            assassin.Attacks.Add('R', new Attack("飛刀", 18, turn => turn % 3 == 0));
+            assassin.Attacks.Add('B', new Attack("轟炸", 20, turn => assassin.playerBag.Count(item => item == 1) > 0));
+
+            cleric.Attacks.Add('Q', new Attack("聖光術", 15, turn => true));
+            cleric.Attacks.Add('W', new Attack("光球術", 15, turn => true));
+            cleric.Attacks.Add('E', new Heal("補血", 5, turn => turn % 2 == 0));
+            cleric.Attacks.Add('R', new Heal("全體補血", 10, turn => turn % 5 == 0));
+            cleric.Attacks.Add('B', new Attack("轟炸", 20, turn => cleric.playerBag.Count(item => item == 1) > 0));
+
+            druid.Attacks.Add('Q', new Attack("狼人嚎叫", 15, turn => true));
+            druid.Attacks.Add('W', new Attack("貓掌揮拳", 15, turn => true));
+            druid.Attacks.Add('E', new Heal("吃個莓果", 5, turn => turn % 2 == 0));
+            druid.Attacks.Add('R', new Attack("豬突猛進", 25, turn => turn % 6 == 0));
+            druid.Attacks.Add('B', new Attack("轟炸", 20, turn => druid.playerBag.Count(item => item == 1) > 0));
+            // 添加其他职业的招式
+        }
+
+        /// <summary>
+        /// 玩家選擇使用的技能
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns>技能名稱</returns>
+        public string SetAttackEnter(Player player)
+        {
+            char attackEnter;
+
+            if (player.isAI)
+            {
+                // 隨機選擇一個有效的攻擊鍵
+                var availableAttacks = player.Attacks.Where(a => a.Value.CanUseSkill(turn) || a.Key == 'B').Select(a => a.Key).ToList();
+                attackEnter = availableAttacks[random.Next(availableAttacks.Count)];
+            }
+            else
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true); // 捕獲按鍵訊息
+                attackEnter = keyInfo.KeyChar;
+            }
+
+            if (char.IsLetter(attackEnter))
+            {
+                attackEnter = char.ToUpper(attackEnter);
+
+                if (player.Attacks.ContainsKey(attackEnter))
+                {
+                    var attack = player.Attacks[attackEnter];
+                    if (attack.name == "轟炸" && !player.playerBag.Contains(1))
+                    {
+                        if (!player.isAI)
+                        {
+                            Console.WriteLine("包包沒有炸彈!!");
+                            return SetAttackEnter(player);
+                        }
+                        else
+                        {
+                            // 電腦玩家重新選擇攻擊
+                            return SetAttackEnter(player);
+                        }
+                    }
+                    if (attack.CanUseSkill(turn))
+                    {
+                        //PrintColorText()
+                        Console.WriteLine($"使用了{attack.name}");
+                        player.strength = attack.strength;
+                        return attack.name;
+                    }
+                    else
+                    {
+                        if (!player.isAI)
+                        {
+                            Console.WriteLine($"當前回合不能使用 {attack.name}。");
+                        }
+                    }
+                }
+                else
+                {
+                    if (!player.isAI)
+                    {
+                        Console.WriteLine("請輸入有效的攻擊鍵");
+                    }
+                }
+                return SetAttackEnter(player);
+            }
+            else
+            {
+                if (!player.isAI)
+                {
+                    Console.WriteLine("\n輸入的不是字母。請再試一次。");
+                }
+                return SetAttackEnter(player);
+            }
         }
 
         /// <summary>
@@ -522,7 +577,7 @@ namespace TextGame
         public void BombFall(Player player)
         {
             int bombHasFall = random.Next(0,2);
-            if(bombHasFall == 1 || bombHasFall == 0)
+            if(bombHasFall == 1)
             {
                 Console.WriteLine("怪物掉落了一個炸彈");
                 //if (player.playerBag.Count < 10 && player.playerBag.FindAll(i => i == 1).Count < player.playerBag.Count)
