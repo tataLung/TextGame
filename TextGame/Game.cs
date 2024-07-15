@@ -15,31 +15,16 @@ namespace TextGame
     //我死了怪物會繼續鞭屍，要修一下
     internal class Game
     {
-        dataManager data ;
-        PlayerManager playerManager;
-        MonsterManager monsterManager;
+        public static dataManager data;
+        public static PlayerManager playerManager;
+        public static MonsterManager monsterManager;
         Random random = new Random();
         public int turn = 0;
-        /// <summary>
-        /// 獲取PlayerManager
-        /// </summary>
-        public PlayerManager GetPlayerManager()
-        {
-            return playerManager;
-        }
-        /// <summary>
-        /// 獲取GetMonsterManager
-        /// </summary>
-        public MonsterManager GetMonsterManager()
-        {
-            return monsterManager;
-        }
-        public Game()
+        static Game()
         {
             data = new dataManager();
             playerManager = new PlayerManager(data);
             monsterManager = new MonsterManager(data);
- 
         }
 
         /// <summary>
@@ -109,13 +94,13 @@ namespace TextGame
                                         switch (attackType)
                                         {
                                             case Skill.skillType.paralysis:
-                                                selectedMonster.effStatus = Monster.effectStatusType.paralysis;
+                                                selectedMonster.effStatus = Utility.effectStatusType.paralysis;
                                                 break;
                                             case Skill.skillType.chaos:
-                                                selectedMonster.effStatus = Monster.effectStatusType.chaos;
+                                                selectedMonster.effStatus = Utility.effectStatusType.chaos;
                                                 break;
                                             default:
-                                                selectedMonster.effStatus = Monster.effectStatusType.normal;
+                                                selectedMonster.effStatus = Utility.effectStatusType.normal;
                                                 break;
                                         }
                                         int damage = PlayerDamage(selectedMonster, player);
@@ -255,7 +240,7 @@ namespace TextGame
             foreach(var player in data.players)
             {
                 Utility.PrintColorText(player.playerClass, ConsoleColor.Green);
-                Console.WriteLine($", 血量: {player.hp}/{player.maxHp}, 力量: {player.strength}, 敏捷: {player.dexterity}, 防禦: {player.armorClass}, 經驗值: {player.experience}, 生命狀態: {(player.hpState == 1 ? "滿血" : player.hpState == 2 ? "失血" : "死亡")}, 效果狀態: {(player.status == 1 ? "正常" : player.status == 2 ? "麻痺" : "中毒")}");
+                Console.WriteLine($", 血量: {player.hp}/{player.maxHp}, 力量: {player.strength}, 敏捷: {player.dexterity}, 防禦: {player.armorClass}, 經驗值: {player.experience}, 生命狀態: {(player.hpStatus == Utility.hpStatusType.fullHp ? "滿血" : player.hpStatus == Utility.hpStatusType.lossHp ? "失血" : "死亡")}, 效果狀態: {(player.effStatus == Utility.effectStatusType.normal ? "正常" : player.effStatus == Utility.effectStatusType.paralysis ? "麻痺" : "中毒")}");
                 Utility.PrintColorText(player.playerClass, ConsoleColor.Green);
                 Console.Write("的包包狀態:");
                 if (player.playerBag.All(item => item == 0))
@@ -285,13 +270,13 @@ namespace TextGame
                     if (int.TryParse(Console.ReadLine(), out index) && index >= 0 && index < monsters.Count)
                     {
                         Monster monster = monsters[index];
-                        if (monster.hpStatus == Monster.hpStatusType.dead)
+                        if (monster.hpStatus == Utility.hpStatusType.dead)
                         {
                             Console.WriteLine("選擇的怪物已死亡!請重新選擇");
                             continue; // 繼續選擇
                         }
                         Utility.PrintColorText(playerClass+"(你)", ConsoleColor.Green);
-                        Console.WriteLine($"選擇: 編號 {index}, {monster.name} - 血量: {monster.hp}/{monster.maxHp}, 效果狀態: {(monster.effStatus == Monster.effectStatusType.normal ? "正常" : monster.effStatus == Monster.effectStatusType.paralysis ? "麻痺" : monster.effStatus == Monster.effectStatusType.chaos ? "渾沌" : "死亡")}");
+                        Console.WriteLine($"選擇: 編號 {index}, {monster.name} - 血量: {monster.hp}/{monster.maxHp}, 效果狀態: {(monster.effStatus == Utility.effectStatusType.normal ? "正常" : monster.effStatus == Utility.effectStatusType.paralysis ? "麻痺" : monster.effStatus == Utility.effectStatusType.chaos ? "渾沌" : "死亡")}");
                         return monster;
                     }
                     else
@@ -308,7 +293,7 @@ namespace TextGame
                         Random random = new Random();
                         Monster selectedMonster = aliveMonsters[random.Next(aliveMonsters.Count)];
                         Utility.PrintColorText(playerClass+"(夥伴)", ConsoleColor.Green);
-                        Console.WriteLine($"選擇: 編號 {selectedMonster.id}, {selectedMonster.name} - 血量: {selectedMonster.hp}/{selectedMonster.maxHp}, 效果狀態: {(selectedMonster.effStatus == Monster.effectStatusType.normal ? "正常" : selectedMonster.effStatus == Monster.effectStatusType.paralysis ? "麻痺" : selectedMonster.effStatus == Monster.effectStatusType.chaos ? "渾沌" : "死亡")}");
+                        Console.WriteLine($"選擇: 編號 {selectedMonster.id}, {selectedMonster.name} - 血量: {selectedMonster.hp}/{selectedMonster.maxHp}, 效果狀態: {(selectedMonster.effStatus == Utility.effectStatusType.normal ? "正常" : selectedMonster.effStatus == Utility.effectStatusType.paralysis ? "麻痺" : selectedMonster.effStatus == Utility.effectStatusType.chaos ? "渾沌" : "死亡")}");
                         return selectedMonster;
                     }
                     else
@@ -491,8 +476,8 @@ namespace TextGame
                 Utility.PrintColorText(monster.name, ConsoleColor.Red);
                 Console.Write("被");
                 Console.WriteLine("殺死了!!");
-                monster.hpStatus = Monster.hpStatusType.dead;
-                monster.effStatus = Monster.effectStatusType.dead;
+                monster.hpStatus = Utility.hpStatusType.dead;
+                monster.effStatus = Utility.effectStatusType.dead;
                 player.experience += monster.experience;
                 Utility.PrintColorText(player.playerClass, ConsoleColor.Green);
                 Console.WriteLine($"獲得了{monster.experience}點經驗值!");
@@ -500,7 +485,7 @@ namespace TextGame
             }
             else
             {
-                monster.hpStatus = Monster.hpStatusType.lossHp;
+                monster.hpStatus = Utility.hpStatusType.lossHp;
                 Utility.PrintColorText(monster.name, ConsoleColor.Red);
                 Console.WriteLine("受到了{0}點傷害，他現在還有{1}點生命值", damage, monster.hp);
             }
@@ -511,7 +496,7 @@ namespace TextGame
         /// </summary>
         public bool AreAllMonstersDead()
         {
-            return data.monsters.All(monster => monster.hpStatus == Monster.hpStatusType.dead);
+            return data.monsters.All(monster => monster.hpStatus == Utility.hpStatusType.dead);
         }
 
         /// <summary>
@@ -519,7 +504,7 @@ namespace TextGame
         /// </summary>
         public bool AreAllPlayersDead()
         {
-            return data.players.All(player => player.hpState == 3);
+            return data.players.All(player => player.hpStatus == Utility.hpStatusType.dead);
         }
 
         //這裡是怪物如果會攻擊回來的程式，目前還沒將進去這個功能
@@ -531,7 +516,7 @@ namespace TextGame
         {
             foreach (var monster in data.monsters)
             {
-                if (monster.effStatus == Monster.effectStatusType.normal)
+                if (monster.effStatus == Utility.effectStatusType.normal)
                 {
                     // 怪物正常攻击玩家
                     if(HitPlayer(monster, data.wizard))
@@ -541,29 +526,26 @@ namespace TextGame
                     }
                     HitPlayer(monster, data.wizard);
                 }
-                else if (monster.effStatus == Monster.effectStatusType.paralysis)
+                else if (monster.effStatus == Utility.effectStatusType.paralysis)
                 {
                     // 怪物麻痹，不能攻击
                     Utility.PrintColorText(monster.name, ConsoleColor.Red);
                     Console.WriteLine("被麻痺了，此回合不能攻擊!");
                 }
-                else if (monster.effStatus == Monster.effectStatusType.chaos)
+                else if (monster.effStatus == Utility.effectStatusType.chaos)
                 {
                     // 怪物渾沌，随机攻击其他怪物
                     RandomAttack(data.monsters,monster);
                 }
 
                 // 回合结束后，将怪物状态重置为正常状态
-                monster.effStatus = Monster.effectStatusType.normal;
+                monster.effStatus = Utility.effectStatusType.normal;
             }
         }
 
         /// <summary>
         /// 怪物攻擊玩家的傷害擲骰，若命中執行傷害計算 (力量+骰子/防禦值 * 5 = 傷害)
         /// </summary>
-        /// <param name="monster"></param>
-        /// <param name="wizard"></param>
-        /// <returns></returns>
         public int MonsterDamage( Monster monster, Player wizard)
         {
             float damage;
@@ -586,9 +568,6 @@ namespace TextGame
         /// <summary>
         /// 怪物攻擊玩家的命中擲骰檢定(敏捷+骰子 > 防禦 = 命中)
         /// </summary>
-        /// <param name="monster"></param>
-        /// <param name="wizard"></param>
-        /// <returns></returns>
         public bool HitPlayer(Monster monster, Player wizard)
         {
             int attak;
@@ -612,8 +591,6 @@ namespace TextGame
         /// <summary>
         /// 怪物陷入渾沌狀態時，隨機攻擊一隻怪物，並造成5點傷害。
         /// </summary>
-        /// <param name="monsters"></param>
-        /// <param name="monster"></param>
         public void RandomAttack(List<Monster> monsters,Monster monster)
         {
             Random random = new Random();
@@ -629,12 +606,11 @@ namespace TextGame
         /// <summary>
         /// 將選擇的怪物復活
         /// </summary>
-        /// <param name="monster"></param>
         public void ReviveMonster(Monster monster)
         {
             monster.hp = monster.maxHp;
-            monster.hpStatus = Monster.hpStatusType.fullHp;
-            monster.effStatus = Monster.effectStatusType.normal;
+            monster.hpStatus = Utility.hpStatusType.fullHp;
+            monster.effStatus = Utility.effectStatusType.normal;
             Utility.PrintColorText(monster.name,ConsoleColor.Red);
             Console.WriteLine("已復活，血量已滿。");
         }
@@ -651,6 +627,26 @@ namespace TextGame
             Console.ForegroundColor = color;
             Console.Write(text);
             Console.ResetColor();
+        }
+
+        /// <summary>
+        /// hp狀態
+        /// </summary>
+        public enum hpStatusType
+        {
+            fullHp,
+            lossHp,
+            dead
+        }
+        /// <summary>
+        /// 效果狀態
+        /// </summary>
+        public enum effectStatusType
+        {
+            normal,
+            paralysis,
+            chaos,
+            dead
         }
     }
 }

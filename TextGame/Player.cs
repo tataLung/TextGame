@@ -17,8 +17,8 @@ namespace TextGame
         public int dexterity { get; set; } //玩家敏捷
         public int armorClass { get; set; } //玩家防禦值
         public int experience { get; set; } //玩家經驗值
-        public int hpState { get; set; } //玩家狀態 1=滿血2=失血3=死亡
-        public int status { get; set; } //玩家狀態 1=正常 2=麻痺 3=中毒
+        public Utility.hpStatusType hpStatus { get; set; } //怪物狀態 1=滿血2=失血3=死亡
+        public Utility.effectStatusType effStatus { get; set; } //怪物狀態 1=正常 2=麻痺 3=渾沌 4=死亡
         public List<int> playerBag { get; set; } //玩家包包 0.空 1.炸彈 2.核彈 3.血包 數量上限10
         public Dictionary<char, Skill> skill { get; set; } = new Dictionary<char, Skill>(); //玩家攻擊招式
         public bool isAI { get; set; }

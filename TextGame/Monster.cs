@@ -20,32 +20,17 @@ namespace TextGame
         public int armorClass { get; set; } //怪物防禦值
         public int experience { get; set; } //怪物經驗值
 
-        public hpStatusType hpStatus { get; set; } //怪物狀態 1=滿血2=失血3=死亡
-        public effectStatusType effStatus { get; set; } //怪物狀態 1=正常 2=麻痺 3=渾沌 4=死亡
+        public Utility.hpStatusType hpStatus { get; set; } //怪物狀態 1=滿血2=失血3=死亡
+        public Utility.effectStatusType effStatus { get; set; } //怪物狀態 1=正常 2=麻痺 3=渾沌 4=死亡
 
         public List<int> Item {  get; set; } //掉落物 1.炸彈 2.核彈 3.血包
-        public enum hpStatusType
-        {
-            fullHp,
-            lossHp,
-            dead
-        }
-        public enum effectStatusType
-        {
-            normal,
-            paralysis,
-            chaos,
-            dead
-        }
+
 
         public Monster(int id)
         {
             this.id = id;
             //this.name = name + id.ToString();
         }
-
-
-
     }
     internal class MonsterManager(dataManager data)
     {
@@ -57,13 +42,13 @@ namespace TextGame
         {
             foreach (var monster in data.monsters)
             {
-                ConsoleColor textColor = monster.hpStatus == hpStatusType.dead ? ConsoleColor.DarkGray : ConsoleColor.White;
-                ConsoleColor monsterTextColor = monster.hpStatus == hpStatusType.dead ? ConsoleColor.DarkRed : ConsoleColor.Red;
+                ConsoleColor textColor = monster.hpStatus == Utility.hpStatusType.dead ? ConsoleColor.DarkGray : ConsoleColor.White;
+                ConsoleColor monsterTextColor = monster.hpStatus == Utility.hpStatusType.dead ? ConsoleColor.DarkRed : ConsoleColor.Red;
                 Utility.PrintColorText($"編號{monster.id}, ", textColor);
                 Utility.PrintColorText(monster.name, monsterTextColor);
                 Utility.PrintColorText($", 血量: {monster.hp}/{monster.maxHp}, 力量: {monster.strength}, 敏捷: {monster.dexterity}, 防禦: {monster.armorClass}, 經驗值: {monster.experience}, " +
-                    $"生命狀態: {(monster.hpStatus == hpStatusType.fullHp ? "滿血" : monster.hpStatus == hpStatusType.lossHp ? "失血" : "死亡")}, " +
-                    $"效果狀態: {(monster.effStatus == effectStatusType.normal ? "正常" : monster.effStatus == effectStatusType.paralysis ? "麻痺" : monster.effStatus == effectStatusType.chaos ? "渾沌" : "死亡")}\n", textColor);
+                    $"生命狀態: {(monster.hpStatus == Utility.hpStatusType.fullHp ? "滿血" : monster.hpStatus == Utility.hpStatusType.lossHp ? "失血" : "死亡")}, " +
+                    $"效果狀態: {(monster.effStatus == Utility.effectStatusType.normal ? "正常" : monster.effStatus == Utility.effectStatusType.paralysis ? "麻痺" : monster.effStatus == Utility.effectStatusType.chaos ? "渾沌" : "死亡")}\n", textColor);
             }
         }
 
@@ -85,8 +70,8 @@ namespace TextGame
                     dexterity = 5,
                     armorClass = 12,
                     experience = 20,
-                    hpStatus = hpStatusType.fullHp,
-                    effStatus = effectStatusType.normal
+                    hpStatus = Utility.hpStatusType.fullHp,
+                    effStatus = Utility.effectStatusType.normal
                 });
             }
         }
