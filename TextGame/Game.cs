@@ -37,6 +37,7 @@ namespace TextGame
                 Console.WriteLine("輸入操作 (0: 結束遊戲, 1: 顯示玩家狀態, 2:顯示怪物狀態 3:進入此回合戰鬥)");
                 char input = Console.ReadKey(true).KeyChar;
                 Monster selectedMonster = null;
+                Player selectedPlayer = null;
                 switch (input)
                 {
                     case '0':
@@ -116,9 +117,45 @@ namespace TextGame
                             {
                                 Console.WriteLine("請先選擇一個怪物");
                             }
-                            if (player == data.players.Last())
+                            //if (player == data.players.Last())
+                            //{
+                            //    Console.WriteLine($"\n第{turn}回合結束-------------------------↑\n");
+                            //}
+                        }
+                        foreach (var monster in data.monsters)
+                        {
+                            // 怪物攻击阶段
+                            selectedPlayer = SelectPlayer(data.players, monster.name);
+                            if (selectedPlayer != null)
                             {
-                                Console.WriteLine($"\n第{turn}回合結束-------------------------↑\n");
+                                if (monster.effStatus == Utility.effectStatusType.normal)
+                                {
+                                    // 怪物正常攻击玩家
+                                    if (HitPlayer(monster, data.wizard))
+                                    {
+                                        int damage = MonsterDamage(monster,selectedPlayer);
+                                        selectedPlayer.hp -= damage;
+                                        ShowPlayerDamageMessage(monster, damage, selectedPlayer);
+                                    }
+                                }
+                                else if (monster.effStatus == Utility.effectStatusType.paralysis)
+                                {
+                                    // 怪物麻痹，不能攻击
+                                    Utility.PrintColorText(monster.name, ConsoleColor.Red);
+                                    Console.WriteLine("被麻痺了，此回合不能攻擊!");
+                                }
+                                else if (monster.effStatus == Utility.effectStatusType.chaos)
+                                {
+                                    // 怪物渾沌，随机攻击其他怪物
+                                    RandomAttack(data.monsters, monster);
+                                }
+
+                                // 回合结束后，将怪物状态重置为正常状态
+                                monster.effStatus = Utility.effectStatusType.normal;
+                            }
+                            else if (!AreAllMonstersDead() && !AreAllPlayersDead())
+                            {
+                                Console.WriteLine("請先選擇一個怪物");
                             }
                         }
 
@@ -512,14 +549,15 @@ namespace TextGame
         /// <summary>
         /// 依照怪物狀態判定怪物動作(1.正常 2.麻痺 3.渾沌 4.死亡)
         /// </summary>
-        public void ExecuteMonsterActions()
+        public void ExecuteMonsterActions(Player player)
         {
             foreach (var monster in data.monsters)
             {
                 if (monster.effStatus == Utility.effectStatusType.normal)
                 {
+                    SelectPlayer(data.players,monster.name);
                     // 怪物正常攻击玩家
-                    if(HitPlayer(monster, data.wizard))
+                    if (HitPlayer(monster, data.wizard))
                     {
                         int damage = MonsterDamage(monster, data.wizard);
                         data.wizard.hp -= damage;
@@ -546,17 +584,17 @@ namespace TextGame
         /// <summary>
         /// 怪物攻擊玩家的傷害擲骰，若命中執行傷害計算 (力量+骰子/防禦值 * 5 = 傷害)
         /// </summary>
-        public int MonsterDamage( Monster monster, Player wizard)
+        public int MonsterDamage( Monster monster, Player player)
         {
             float damage;
             int damageRoll = rollDice(monster.name, "傷害");
 
-            damage = (monster.strength + damageRoll) / wizard.armorClass * 5;
+            damage = (monster.strength + damageRoll) / player.armorClass * 5;
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write(monster.name);
             Console.ResetColor();
-            Console.WriteLine($"骰中{damageRoll}，傷害值為({wizard.strength}+{damageRoll})/{monster.armorClass}*5={(int)damage}");
+            Console.WriteLine($"骰中{damageRoll}，傷害值為({player.strength}+{damageRoll})/{monster.armorClass}*5={(int)damage}");
             if (damageRoll == 20)
             {
                 damage += 5;
@@ -568,25 +606,72 @@ namespace TextGame
         /// <summary>
         /// 怪物攻擊玩家的命中擲骰檢定(敏捷+骰子 > 防禦 = 命中)
         /// </summary>
-        public bool HitPlayer(Monster monster, Player wizard)
+        public bool HitPlayer(Monster monster, Player player)
         {
             int attak;
             int hitRoll = rollDice(monster.name, "命中");
-            attak = wizard.dexterity + hitRoll;
+            attak = player.dexterity + hitRoll;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write(monster.name);
             Console.ResetColor();
-            if (attak >= wizard.armorClass)
+            if (attak >= player.armorClass)
             {
-                Console.WriteLine("骰中{0}，命中值為{1}+{2}={3}", hitRoll, wizard.dexterity, hitRoll, attak);
+                Console.WriteLine("骰中{0}，命中值為{1}+{2}={3}", hitRoll, player.dexterity, hitRoll, attak);
             }
             else
             {
-                Console.WriteLine("骰中{0}，命中值為{1}+{2}={3}，對方防禦為{4}，未命中", hitRoll, wizard.dexterity, hitRoll, attak, wizard.armorClass);
+                Console.WriteLine("骰中{0}，命中值為{1}+{2}={3}，對方防禦為{4}，未命中", hitRoll, player.dexterity, hitRoll, attak, player.armorClass);
             }
 
-            return attak >= wizard.armorClass;
+            return attak >= player.armorClass;
         }
+
+        /// <summary>
+        /// 選擇要攻擊的怪物
+        /// </summary>
+        public Player SelectPlayer(List<Player> players, string name)
+        {
+            while (true)
+            {
+                List<Player> alivePlayers = players.Where(m => m.hp > 0).ToList();
+                if (alivePlayers.Count > 0)
+                {
+                    Random random = new Random();
+                    Player selectedPlayer = alivePlayers[random.Next(alivePlayers.Count)];
+                    Utility.PrintColorText(name , ConsoleColor.Red);
+                    Console.WriteLine($"攻擊: {selectedPlayer.playerClass} - 血量: {selectedPlayer.hp}/{selectedPlayer.maxHp}, 效果狀態: {(selectedPlayer.effStatus == Utility.effectStatusType.normal ? "正常" : selectedPlayer.effStatus == Utility.effectStatusType.paralysis ? "麻痺" : selectedPlayer.effStatus == Utility.effectStatusType.chaos ? "渾沌" : "死亡")}");
+                    return selectedPlayer;
+                }
+                else
+                {
+                    Console.WriteLine("勇者小隊已全數殲滅。");
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 顯示怪物受到傷害後失血或死亡狀態
+        /// </summary>
+        public void ShowPlayerDamageMessage(Monster monster, int damage, Player player)
+        {
+            if (player.hp <= 0)
+            {
+                player.hp = 0;
+                Utility.PrintColorText(player.playerClass, ConsoleColor.Green);
+                Console.Write("被");
+                Console.WriteLine("殺死了!!");
+                player.hpStatus = Utility.hpStatusType.dead;
+                player.effStatus = Utility.effectStatusType.dead;
+            }
+            else
+            {
+                player.hpStatus = Utility.hpStatusType.lossHp;
+                Utility.PrintColorText(player.playerClass, ConsoleColor.Green);
+                Console.WriteLine("受到了{0}點傷害，他現在還有{1}點生命值", damage, player.hp);
+            }
+        }
+
 
         /// <summary>
         /// 怪物陷入渾沌狀態時，隨機攻擊一隻怪物，並造成5點傷害。
